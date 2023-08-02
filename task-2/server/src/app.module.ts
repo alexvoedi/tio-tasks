@@ -4,6 +4,6 @@ import { EventsModule } from './events/events.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule.forRoot({}), TicketsModule, EventsModule],
+  imports: [ConfigModule.forRoot(), TicketsModule, EventsModule],
 })
 export class AppModule {}

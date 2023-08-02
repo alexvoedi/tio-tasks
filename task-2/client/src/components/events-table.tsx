@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,26 +8,7 @@ import {
 } from "@mui/material";
 import { Event } from "../interfaces/Event";
 
-export function EventsTable() {
-  const [events, setEvents] = useState<Event[]>([]);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const url = new URL("events", import.meta.env.VITE_BACKEND_URL);
-
-      const result = await fetch(url, {
-        headers: {
-          Accept: "application/json",
-        },
-      });
-      const json = await result.json();
-
-      setEvents(json);
-    };
-
-    fetchEvents();
-  }, []);
-
+export function EventsTable({ events }: { events: Event[] }) {
   return (
     <TableContainer>
       <Table>
