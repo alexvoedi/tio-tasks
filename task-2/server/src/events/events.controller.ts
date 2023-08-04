@@ -15,9 +15,9 @@ import { UpdateEventDto } from './dtos/update-event.dto';
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Get(':id')
-  async getById(@Param('id') id: string) {
-    return this.eventsService.getOne(id);
+  @Get(':eventId')
+  async getById(@Param('eventId') eventId: string) {
+    return this.eventsService.getOne(eventId);
   }
 
   @Get()
@@ -30,13 +30,13 @@ export class EventsController {
     return this.eventsService.create(dto);
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateEventDto) {
-    return this.eventsService.update(id, dto);
+  @Patch(':eventId')
+  async update(@Param('eventId') eventId: string, @Body() dto: UpdateEventDto) {
+    return this.eventsService.update(eventId, dto);
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return this.eventsService.delete(id);
+  @Delete(':eventId')
+  async delete(@Param('eventId') eventId: string) {
+    return this.eventsService.delete(eventId);
   }
 }

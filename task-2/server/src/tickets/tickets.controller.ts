@@ -11,32 +11,52 @@ import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dtos/create-ticket.dto';
 import { UpdateTicketDto } from './dtos/update-ticket.dto';
 
-@Controller('tickets')
+@Controller()
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
-  @Get(':id')
-  async getById(@Param('id') id: string) {
-    return this.ticketsService.getOne(id);
+  @Get(['tickets/:ticketId', 'events/:eventId/tickets/:ticketId'])
+  async getById(
+    @Param('eventId') eventId: string,
+    @Param('ticketId') ticketId: string,
+  ) {
+    return this.ticketsService.getOne(ticketId);
   }
 
-  @Get()
-  async getAll() {
-    return this.ticketsService.getAll();
+  @Get(['tickets', 'events/:eventId/tickets'])
+  async getAll(@Param('eventId') eventId?: string) {
+    if (eventId) {
+      return this.ticketsService.getByEventId(eventId);
+    } else {
+      return this.ticketsService.getAll();
+    }
   }
 
-  @Post()
-  async create(@Body() dto: CreateTicketDto) {
-    return this.ticketsService.create(dto);
+  @Post('events/:eventId/tickets')
+  async create(
+    @Param('eventId') eventId: string,
+    @Body() dto: CreateTicketDto,
+  ) {
+    return this.ticketsService.create({
+      ...dto,
+      eventId,
+    });
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateTicketDto) {
-    return this.ticketsService.update(id, dto);
+  @Patch(['tickets/:ticketId', 'events/:eventId/tickets/:ticketId'])
+  async update(
+    @Param('ticketId') ticketId: string,
+    @Param('eventId') eventId: string,
+    @Body() dto: UpdateTicketDto,
+  ) {
+    return this.ticketsService.update(ticketId, dto);
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return this.ticketsService.delete(id);
+  @Delete(['tickets/:ticketId', 'events/:eventId/tickets/:ticketId'])
+  async delete(
+    @Param('eventId') eventId: string,
+    @Param('ticketId') ticketId: string,
+  ) {
+    return this.ticketsService.delete(ticketId);
   }
 }

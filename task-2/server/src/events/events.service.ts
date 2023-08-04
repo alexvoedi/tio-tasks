@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { EventsRepository } from './events.repository';
-import { CreateEventDto } from './dtos/create-event.dto';
 import { UpdateEventDto } from './dtos/update-event.dto';
 import { TicketsRepository } from '../tickets/tickets.repository';
+import { Event } from './event';
+import { Ticket } from '../tickets/ticket';
+import { DeepPartial } from '../types/deep-partial';
 
 @Injectable()
 export class EventsService {
@@ -15,7 +17,7 @@ export class EventsService {
     const event = await this.eventsRepository.getOne(id);
 
     if (!event) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
 
     return event;
@@ -25,15 +27,19 @@ export class EventsService {
     return this.eventsRepository.getAll();
   }
 
-  async create(data: CreateEventDto) {
+  async create(
+    data: Omit<Event, 'id' | 'tickets'> & {
+      tickets?: Omit<Ticket, 'id' | 'eventId'>[];
+    },
+  ) {
     return this.eventsRepository.create(data);
   }
 
-  async update(id: string, data: UpdateEventDto) {
+  async update(id: string, data: DeepPartial<Event>) {
     const event = await this.getOne(id);
 
     if (!event) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
 
     return this.eventsRepository.update(id, data);
@@ -43,7 +49,7 @@ export class EventsService {
     const event = await this.getOne(id);
 
     if (!event) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
 
     return this.eventsRepository.delete(id);
@@ -53,13 +59,13 @@ export class EventsService {
     const event = await this.getOne(eventId);
 
     if (!event) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
 
     const ticket = await this.ticketsRepository.getOne(ticketId);
 
     if (!ticket) {
-      throw new Error('Ticket not found');
+      throw new NotFoundException('Ticket not found');
     }
 
     return this.eventsRepository.update(eventId, ticket);

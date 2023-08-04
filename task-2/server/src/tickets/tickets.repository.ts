@@ -4,7 +4,7 @@ import { Ticket } from './ticket';
 import { randomUUID } from 'crypto';
 import { ID } from '../db/identifier';
 import { DeepPartial } from '../types/deep-partial';
-import merge from 'lodash.merge';
+import { merge } from 'lodash';
 
 @Injectable()
 export class TicketsRepository implements BaseRepository<Ticket> {
@@ -16,6 +16,10 @@ export class TicketsRepository implements BaseRepository<Ticket> {
 
   async getAll(): Promise<Ticket[]> {
     return this.tickets;
+  }
+
+  async getByEventId(eventId: ID): Promise<Ticket[]> {
+    return this.tickets.filter((ticket) => ticket.eventId === eventId);
   }
 
   async create(
@@ -47,5 +51,16 @@ export class TicketsRepository implements BaseRepository<Ticket> {
     this.tickets.splice(index, 1);
 
     return ticket;
+  }
+
+  async deleteByEventId(eventId: ID): Promise<Ticket[]> {
+    const tickets = this.tickets.filter((ticket) => ticket.eventId === eventId);
+
+    this.tickets.splice(
+      this.tickets.findIndex((ticket) => ticket.eventId === eventId),
+      1,
+    );
+
+    return tickets;
   }
 }

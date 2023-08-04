@@ -5,26 +5,32 @@ import { randomUUID } from 'crypto';
 import { DeepPartial } from '../types/deep-partial';
 import { TicketsRepository } from '../tickets/tickets.repository';
 import { Ticket } from '../tickets/ticket';
-import merge from 'lodash.merge';
+import { merge } from 'lodash';
 import { ID } from '../db/identifier';
 
 @Injectable()
 export class EventsRepository implements BaseRepository<Event> {
-  constructor(private readonly ticketsRepository: TicketsRepository) {}
-
   private readonly events: Event[] = [];
+
+  constructor(private readonly ticketsRepository: TicketsRepository) {}
 
   async getOne(id: ID): Promise<Event> {
     return this.events.find((event) => event.id === id);
   }
 
   async getAll(): Promise<Event[]> {
-    return this.events;
+    const events = this.events;
+
+    for (const event of events) {
+      event.tickets = await this.ticketsRepository.getByEventId(event.id);
+    }
+
+    return events;
   }
 
   async create(
-    data: Pick<Event, 'city' | 'date' | 'title'> & {
-      tickets?: Pick<Ticket, 'barcode' | 'name'>[];
+    data: Omit<Event, 'id' | 'tickets'> & {
+      tickets?: Omit<Ticket, 'id' | 'eventId'>[];
     },
   ): Promise<Event> {
     const eventId = randomUUID();
@@ -65,6 +71,8 @@ export class EventsRepository implements BaseRepository<Event> {
     const event = this.events[index];
 
     this.events.splice(index, 1);
+
+    this.ticketsRepository.deleteByEventId(id);
 
     return event;
   }

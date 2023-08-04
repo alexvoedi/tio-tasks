@@ -2,9 +2,9 @@ import { CreateTicketDto } from '../../tickets/dtos/create-ticket.dto';
 import {
   IsString,
   IsNotEmpty,
-  IsDate,
   IsArray,
   ValidateNested,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateEventDto {
@@ -12,7 +12,7 @@ export class CreateEventDto {
   @IsNotEmpty()
   title: string;
 
-  @IsDate()
+  @IsDateString()
   date: Date;
 
   @IsString()

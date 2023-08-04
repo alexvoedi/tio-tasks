@@ -3,7 +3,7 @@ import { Ticket } from "./Ticket";
 export interface Event {
   id: string;
   title: string;
-  date: Date;
+  date: string;
   city: string;
   tickets: Ticket[]
 }

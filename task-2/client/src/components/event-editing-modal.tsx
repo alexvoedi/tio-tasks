@@ -6,41 +6,45 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  IconButton,
   Input,
   InputLabel,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-
 import { useState } from "react";
+import EditIcon from "@mui/icons-material/Edit";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Event } from "../interfaces/Event";
+import dayjs from 'dayjs';
 
-export function EventCreationModal({
-  addEvent,
+export function EventEditingModal({
+  event,
+  updateEvent
 }: {
-  addEvent: (event: Event) => void;
+  updateEvent: (event: Event) => void;
+  event: Event;
 }) {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const [title, setTitle] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [date, setDate] = useState<string | null>(null);
+  const [title, setTitle] = useState(event.title);
+  const [city, setCity] = useState(event.city);
+  const [date, setDate] = useState<dayjs.Dayjs | null>(dayjs(event.date));
   const [errors, setErrors] = useState<string | null>(null);
 
   const submit = async () => {
     setErrors(null);
 
-    const url = new URL("events", import.meta.env.VITE_BACKEND_URL);
+    const url = new URL(`events/${event.id}`, import.meta.env.VITE_BACKEND_URL);
 
     try {
       const result = await fetch(url, {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title, city, date, tickets: [] }),
+        body: JSON.stringify({ title, city, date }),
       });
 
       const json = await result.json();
@@ -49,25 +53,23 @@ export function EventCreationModal({
         throw new Error(json.message);
       }
 
-      setTitle("");
-      setCity("");
-      setDate(null);
-
-      addEvent(json);
+      updateEvent(json);
       handleClose();
     } catch (error) {
       if (error instanceof Error) {
         setErrors(error.message);
       }
     }
-  };
+  }
 
   return (
     <>
-      <Button onClick={handleOpen}>Create Event</Button>
+      <IconButton onClick={handleOpen}>
+        <EditIcon />
+      </IconButton>
 
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Create Event</DialogTitle>
+        <DialogTitle>Edit Event</DialogTitle>
 
         <DialogContent
           style={{
@@ -77,11 +79,7 @@ export function EventCreationModal({
             width: "36rem",
           }}
         >
-          {
-            errors && (
-              <Alert severity="error">{errors}</Alert>
-            )
-          }
+          {errors && <Alert severity="error">{errors}</Alert>}
 
           <FormControl>
             <InputLabel htmlFor="title">Title</InputLabel>
@@ -112,7 +110,7 @@ export function EventCreationModal({
 
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={submit}>Create</Button>
+          <Button onClick={submit}>Submit</Button>
         </DialogActions>
       </Dialog>
     </>

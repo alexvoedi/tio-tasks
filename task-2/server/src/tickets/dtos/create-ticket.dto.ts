@@ -10,10 +10,6 @@ import { CreateNameDto } from '../../customers/dtos/create-name.dto';
 export class CreateTicketDto {
   @IsString()
   @IsNotEmpty()
-  eventId: string;
-
-  @IsString()
-  @IsNotEmpty()
   @MaxLength(8)
   barcode: string;
 

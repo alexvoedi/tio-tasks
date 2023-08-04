@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TicketsRepository } from './tickets.repository';
-import { CreateTicketDto } from './dtos/create-ticket.dto';
-import { UpdateTicketDto } from './dtos/update-ticket.dto';
+import { Ticket } from './ticket';
+import { DeepPartial } from '../types/deep-partial';
 
 @Injectable()
 export class TicketsService {
@@ -11,25 +11,29 @@ export class TicketsService {
     const ticket = this.ticketsRepository.getOne(id);
 
     if (!ticket) {
-      throw new Error('Ticket not found');
+      throw new NotFoundException('Ticket not found');
     }
 
     return ticket;
   }
 
   async getAll() {
-    return this.ticketsRepository.getAll();
+    return await this.ticketsRepository.getAll();
   }
 
-  async create(data: CreateTicketDto) {
+  async getByEventId(eventId: string) {
+    return await this.ticketsRepository.getByEventId(eventId);
+  }
+
+  async create(data: Omit<Ticket, 'id'>) {
     return this.ticketsRepository.create(data);
   }
 
-  async update(id: string, data: UpdateTicketDto) {
+  async update(id: string, data: DeepPartial<Ticket>) {
     const ticket = await this.getOne(id);
 
     if (!ticket) {
-      throw new Error('Ticket not found');
+      throw new NotFoundException('Ticket not found');
     }
 
     return this.ticketsRepository.update(id, data);
@@ -39,7 +43,7 @@ export class TicketsService {
     const ticket = await this.getOne(id);
 
     if (!ticket) {
-      throw new Error('Ticket not found');
+      throw new NotFoundException('Ticket not found');
     }
 
     return this.ticketsRepository.delete(id);
