@@ -1,17 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EventsRepository } from './events.repository';
-import { UpdateEventDto } from './dtos/update-event.dto';
-import { TicketsRepository } from '../tickets/tickets.repository';
 import { Event } from './event';
 import { Ticket } from '../tickets/ticket';
 import { DeepPartial } from '../types/deep-partial';
 
 @Injectable()
 export class EventsService {
-  constructor(
-    private readonly eventsRepository: EventsRepository,
-    private readonly ticketsRepository: TicketsRepository,
-  ) {}
+  constructor(private readonly eventsRepository: EventsRepository) {}
 
   async getOne(id: string) {
     const event = await this.eventsRepository.getOne(id);
@@ -53,21 +48,5 @@ export class EventsService {
     }
 
     return this.eventsRepository.delete(id);
-  }
-
-  async addTicket(eventId: string, ticketId: string) {
-    const event = await this.getOne(eventId);
-
-    if (!event) {
-      throw new NotFoundException('Event not found');
-    }
-
-    const ticket = await this.ticketsRepository.getOne(ticketId);
-
-    if (!ticket) {
-      throw new NotFoundException('Ticket not found');
-    }
-
-    return this.eventsRepository.update(eventId, ticket);
   }
 }
