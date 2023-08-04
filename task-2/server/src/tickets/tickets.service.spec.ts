@@ -114,6 +114,7 @@ describe('TicketsService', () => {
         city: 'Leipzig',
         title: 'Wacken',
         date: new Date(),
+        tickets: [],
       };
 
       (eventsRepository.getOne as jest.Mock).mockResolvedValue(event);
